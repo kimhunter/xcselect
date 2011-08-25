@@ -35,7 +35,11 @@ class Xcode
   def eql?(o)
     return (o.folder == folder && o.version == version && o.build == build)
   end
-  
+
+  def sdks
+    `#{xcodebuild_path} -showsdks`
+  end
+
   def set_current
     puts "Enter sudo password to select #{self}"
     `sudo xcode-select -switch #{folder}`
@@ -88,7 +92,9 @@ class Main
   end
   
   def show_current()
-    puts Xcode.new(Xcode.current_xcode)
+    cur = Xcode.new(Xcode.current_xcode)
+    puts cur
+    puts cur.sdks
   end
   
   def console_availale
@@ -125,9 +131,6 @@ class Main
     end    
   end
   
-  def select(i)
-    
-  end
   
   def load_xcodes
     @xcodes = Xcode.find_all
