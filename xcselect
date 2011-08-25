@@ -15,22 +15,27 @@ class Xcode
   end
   
   def to_s
-    "#{folder} - #{version} (#{build})"
+    "Xcode:#{folder} - #{version} (#{build})"
   end
   
   def self.find_all
     xcode_builds = `mdfind -name xcodebuild`.chomp.split  
-    xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /\/Volumes/) && File.exists?(x) }
-    
+    xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /^\/(Volumes|usr\/bin\/)/) && File.exists?(x) }
+    puts xcode_builds
+    puts xcode_builds.size
     xcode_objs = xcode_builds.map {|p| 
-      p = p.sub( /\/usr\/bin.*/, '').chomp
-      Xcode.new(p) if p.size
+      Xcode.new p.sub( /\/usr\/bin.*/, '').chomp.strip
+      
     }    
     xcode_objs.sort
   end
     
   def self.current_xcode
     `xcode-select -print-path`.chomp
+  end
+  
+  def eql?(o)
+    return (o.folder == folder && o.version == version && o.build == build)
   end
   
   def set_current
@@ -42,9 +47,64 @@ class Xcode
   end
 end
 
-def display_menu(xcodes)
-  i = 0
-  xcodes.map { |x| "[#{i+=1}] #{x.to_s}" }
+class Main
+  attr_accessor :xcodes, :current
+  
+  def initialize
+    optparse = OptionParser.new do |opts|
+      opts.on('-h', '--help', "Display this !!") { puts opts; exit }
+    end
+    
+    begin
+      load_xcodes
+      optparse.parse!
+      show_menu
+    rescue OptionParser::MissingArgument => e
+      puts e
+      return nil
+    rescue Exception => e
+      puts e
+      puts e.backtrace
+      return 1
+    end
+    
+  end
+  
+  def show_menu
+    puts "Please Select an Xcode install ?\n\n"
+    i = 0;
+    xopts = xcodes.each do |x|
+      puts "   [#{i+=1}]    Xcode #{x.version} (#{x.build}) #{x.folder} #{'*current*' if x.eql? current}"
+    end
+    print "Selection: "
+    begin
+      input =  gets.to_i
+      puts input
+      unless (input.zero? || xcodes[input - 1].eql?(current))
+        new_sel = xcodes[input - 1]
+        puts "Enter sudo password to select #{new_sel}"
+        new_sel.set_current
+      end
+    rescue Exception => e
+      puts e
+      puts e.backtrace
+    end    
+  end
+  
+  def select(i)
+    
+  end
+  
+  def load_xcodes
+    @xcodes = Xcode.find_all
+    @current = xcodes.select {|x| x.folder == Xcode.current_xcode}.first   
+  end
+    
+  def to_s
+    "xcodes = #{xcodes} current = #{current}"
+  end
+  
+  
 end
 
 xcodes = Xcode.find_all
