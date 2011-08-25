@@ -44,7 +44,10 @@ class Xcode
   
   def <=>(o)
     res = Float(version) <=> Float(o.version) 
-    return o.build <=> build if res == 0 
+    return res == 0 ?  o.build <=> build : res;
+
+
+    
   end
 end
 
