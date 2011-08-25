@@ -69,6 +69,10 @@ class Main
     
   end
   
+  def console_availale
+    STDIN.tty?
+  end
+  
   def show_menu
     puts "Please Select an Xcode install ?\n\n"
     i = 0;
@@ -77,6 +81,7 @@ class Main
     end
     print "\nSelection: "
     begin
+      return unless console_availale
       input =  STDIN.gets
       input = input.to_i
 
@@ -114,9 +119,6 @@ class Main
   
 end
 
-xcodes = Xcode.find_all
-
 main = Main.new
-
 
 exit main.exit_code
