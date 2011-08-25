@@ -42,11 +42,9 @@ class Xcode
   def self.find_all
     xcode_builds = `mdfind -name xcodebuild`.chomp.split  
     xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /^\/(Volumes|usr\/bin\/)/) && File.exists?(x) }
-    xcode_objs = xcode_builds.map {|p| 
-      Xcode.new p.sub( /\/usr\/bin.*/, '').chomp.strip
-      
-    }    
+    xcode_objs = xcode_builds.map {|p| Xcode.new p.sub( /\/usr\/bin.*/, '').chomp.strip }
     xcode_objs.sort
+
   end
     
   def self.current_xcode
@@ -60,12 +58,6 @@ class Xcode
 
   def sdks
     `#{xcodebuild_path} -showsdks`
-  end
-
-  def set_current
-    puts "Enter sudo password to select #{self}"
-    `sudo xcode-select -switch #{folder}`
-    puts "Set Xcode to #{self}"
   end
   
   def <=>(o)
@@ -107,10 +99,21 @@ class Main
     if xcodes.size > 1 
       cur_index = xcodes.index(current)
       next_index = (cur_index + 1) % xcodes.size
-      xcodes[next_index].set_current
+      set_current xcodes[next_index]
     end
     
     exit
+  end
+
+  # don't show line to ask for sudo pass 
+  def self.require_sudo_pass?
+    `sudo -n echo 1 2>&1`.chomp != "1"
+  end
+  
+  def set_current xc
+    puts "Enter sudo password to select #{xc}" if Main.require_sudo_pass?
+    `sudo xcode-select -switch #{xc.folder}`
+    puts "Set Xcode to #{xc}"
   end
   
   def show_current()
@@ -146,8 +149,7 @@ class Main
         puts "Already Current"
         @exit_code = 2
       else
-        new_sel = xcodes[input - 1]
-        new_sel.set_current
+        set_current xcodes[input - 1]
       end
     rescue SystemExit, Interrupt
       puts ""
@@ -162,7 +164,7 @@ class Main
   end
     
   def to_s
-    "xcodes = #{xcodes} current = #{current}"
+    "xcodes = #{xcodes}\n current = #{current}"
   end
   
   
