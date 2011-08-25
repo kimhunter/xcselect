@@ -21,8 +21,6 @@ class Xcode
   def self.find_all
     xcode_builds = `mdfind -name xcodebuild`.chomp.split  
     xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /^\/(Volumes|usr\/bin\/)/) && File.exists?(x) }
-    puts xcode_builds
-    puts xcode_builds.size
     xcode_objs = xcode_builds.map {|p| 
       Xcode.new p.sub( /\/usr\/bin.*/, '').chomp.strip
       
@@ -49,15 +47,16 @@ end
 
 class Main
   attr_accessor :xcodes, :current
-  
+  attr_reader :exit_code 
   def initialize
+    @exit_code = 0
     optparse = OptionParser.new do |opts|
       opts.on('-h', '--help', "Display this !!") { puts opts; exit }
     end
     
     begin
       load_xcodes
-      optparse.parse!
+      # optparse.parse!
       show_menu
     rescue OptionParser::MissingArgument => e
       puts e
@@ -76,14 +75,22 @@ class Main
     xopts = xcodes.each do |x|
       puts "   [#{i+=1}]    Xcode #{x.version} (#{x.build}) #{x.folder} #{'*current*' if x.eql? current}"
     end
-    print "Selection: "
+    print "\nSelection: "
     begin
-      input =  gets.to_i
-      puts input
-      unless (input.zero? || xcodes[input - 1].eql?(current))
+      input =  STDIN.gets
+      input = input.to_i
+
+      if input.zero? or input > xcodes.size
+        puts "Invalid Selection"
+        @exit_code = 1
+      elsif xcodes[input - 1].eql?(current)
+        puts "Already Current"
+        @exit_code = 2
+      else
         new_sel = xcodes[input - 1]
         puts "Enter sudo password to select #{new_sel}"
         new_sel.set_current
+        puts "Set Xcode to #{new_sel}"
       end
     rescue Exception => e
       puts e
@@ -109,5 +116,7 @@ end
 
 xcodes = Xcode.find_all
 
+main = Main.new
 
-puts xcodes
+
+exit main.exit_code
