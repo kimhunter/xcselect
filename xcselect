@@ -15,7 +15,7 @@ class Xcode
   end
   
   def to_s
-    "Xcode:#{folder} - #{version} (#{build})"
+    "Xcode: #{folder} - #{version} (#{build})"
   end
   
   def self.find_all
