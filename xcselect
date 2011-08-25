@@ -37,11 +37,14 @@ class Xcode
   end
   
   def set_current
+    puts "Enter sudo password to select #{self}"
     `sudo xcode-select -switch #{folder}`
+    puts "Set Xcode to #{self}"
   end
   
   def <=>(o)
-    Float(version) <=> Float(o.version)
+    res = Float(version) <=> Float(o.version) 
+    return o.build <=> build if res == 0 
   end
 end
 
@@ -52,11 +55,12 @@ class Main
     @exit_code = 0
     optparse = OptionParser.new do |opts|
       opts.on('-h', '--help', "Display this !!") { puts opts; exit }
+      opts.on('-a', '--alt' , "Alternate through all installs") { select_next() }
     end
+    optparse.parse!
     
     begin
       load_xcodes
-      # optparse.parse!
       show_menu
     rescue OptionParser::MissingArgument => e
       puts e
@@ -64,15 +68,25 @@ class Main
     rescue Exception => e
       puts e
       puts e.backtrace
-      return 1
+      return 
+    end
+  end
+  
+  def select_next
+    load_xcodes
+    if xcodes.size > 1 
+      cur_index = xcodes.index(current)
+      next_index = (cur_index + 1) % xcodes.size
+      xcodes[next_index].set_current
     end
     
+    exit
   end
   
   def console_availale
     STDIN.tty?
   end
-  
+    
   def show_menu
     puts "Please Select an Xcode install ?\n\n"
     i = 0;
