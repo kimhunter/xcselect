@@ -58,7 +58,8 @@ class Main
     @exit_code = 0
     optparse = OptionParser.new do |opts|
       opts.on('-h', '--help', "Display this !!") { puts opts; exit }
-      opts.on('-a', '--alt' , "Alternate through all installs") { select_next() }
+      opts.on('-a', '--alt' , "Alternate through all installs") { select_next() ;exit}
+      opts.on('-s', '--show' , "Show Current") { show_current() ;exit}
     end
     optparse.parse!
     
@@ -84,6 +85,10 @@ class Main
     end
     
     exit
+  end
+  
+  def show_current()
+    puts Xcode.new(Xcode.current_xcode)
   end
   
   def console_availale
