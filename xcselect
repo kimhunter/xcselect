@@ -54,6 +54,7 @@ class Xcode
   end
   
   def eql?(o)
+    return false if o.nil? 
     return (o.folder == folder && o.version == version && o.build == build)
   end
 
