@@ -123,11 +123,15 @@ class Main
     STDIN.tty?
   end
     
+  def select_line x
+    "#{x.version} (#{x.build}) #{x.folder} #{'[current]'.red if x.eql? current}"
+  end
   def show_menu
     puts "Please Select an Xcode install ?\n\n"
     i = 0;
     xopts = xcodes.each do |x|
-      puts "   [#{i+=1}]    Xcode #{x.version} (#{x.build}) #{x.folder} #{'*current*' if x.eql? current}"
+      select_no = "[#{i+=1}]" 
+      puts "   #{select_no}    Xcode #{select_line x}"
     end
     print "\nSelection: "
     begin
