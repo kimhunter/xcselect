@@ -8,4 +8,11 @@ Basic usage
     
     Selection: 
 
-Use -a to switch to the next xcode
+
+Use -a to switch to the next xcode  
+
+    xcselect -a
+    
+use show -s to print info about the current xcode  
+
+    xcselect -s
