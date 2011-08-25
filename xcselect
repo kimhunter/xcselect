@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+class Xcode
+  include Comparable
+  attr_accessor :folder, :version, :build
+  def initialize(fld)
+    @folder = fld
+    ver_output = `#{xcodebuild_path} -version`
+    @version = ver_output.match(/Xcode (.*)$/)[1]
+    @build = ver_output.match(/Build version (.*)$/)[1]
+  end
+
+  def xcodebuild_path
+    "#{folder}/usr/bin/xcodebuild"
+  end
+  
+  def to_s
+    "#{folder} - #{version} (#{build})"
+  end
+  
+  def self.find_all
+    xcode_builds = `mdfind -name xcodebuild`.chomp.split  
+    xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /\/Volumes/) && File.exists?(x) }
+    
+    xcode_objs = xcode_builds.map {|p| 
+      p = p.sub( /\/usr\/bin.*/, '').chomp
+      Xcode.new(p) if p.size
+    }    
+    xcode_objs.sort
+  end
+    
+  def self.current_xcode
+    `xcode-select -print-path`.chomp
+  end
+  
+  def set_current
+    `sudo xcode-select -switch #{folder}`
+  end
+  
+  def <=>(o)
+    Float(version) <=> Float(o.version)
+  end
+end
+
+def display_menu(xcodes)
+  i = 0
+  xcodes.map { |x| "[#{i+=1}] #{x.to_s}" }
+end
+
+xcodes = Xcode.find_all
+
+
+puts xcodes
