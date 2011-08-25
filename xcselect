@@ -143,13 +143,11 @@ class Main
         @exit_code = 2
       else
         new_sel = xcodes[input - 1]
-        puts "Enter sudo password to select #{new_sel}"
         new_sel.set_current
-        puts "Set Xcode to #{new_sel}"
       end
-    rescue Exception => e
-      puts e
-      puts e.backtrace
+    rescue SystemExit, Interrupt
+      puts ""
+      return
     end    
   end
   
