@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-require "optparse"
+require 'optparse'
+
 # eye candy.
 class String
   def red; colorize(self, "\e[1m\e[31m"); end
@@ -15,7 +16,7 @@ class String
   def colorize(text, color_code)  
     (STDIN.tty?) ? "#{color_code}#{text}\e[0m" : text
   end
-    
+
   def numeric?
     true if Float(self) rescue false
   end
@@ -34,11 +35,11 @@ class Xcode
   def xcodebuild_path
     "#{folder}/usr/bin/xcodebuild"
   end
-  
+
   def to_s
     "Xcode: #{folder} - #{version} (#{build})"
   end
-  
+
   def self.find_all
     xcode_builds = `mdfind -name xcodebuild`.chomp.split  
     xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /^\/(Volumes|usr\/bin\/)/) && File.exists?(x) }
@@ -46,11 +47,11 @@ class Xcode
     xcode_objs.sort
 
   end
-    
+
   def self.current_xcode
     `xcode-select -print-path`.chomp
   end
-  
+
   def eql?(o)
     return false if o.nil? 
     return (o.folder == folder && o.version == version && o.build == build)
@@ -59,15 +60,16 @@ class Xcode
   def sdks
     `#{xcodebuild_path} -showsdks`
   end
-  
+
   def <=>(o)
     res = Float(version) <=> Float(o.version) 
     return res == 0 ?  o.build <=> build : res;
 
 
-    
+
   end
 end
+
 
 class Main
   attr_accessor :xcodes, :current
