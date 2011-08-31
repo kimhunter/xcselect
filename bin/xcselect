@@ -37,6 +37,14 @@ class Main
       opts.on('-a', '--alt' , "Alternate through all installs") { select_next() ;exit}
       opts.on('-s', '--show' , "Show Current") { show_current() ;exit}
     end
+    begin
+      optparse.parse!
+    rescue OptionParser::InvalidOption => e
+      puts "Invalid Option"
+      puts optparse
+      exit 2
+    end
+    
     optparse.parse!
     
     begin
