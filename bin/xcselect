@@ -113,8 +113,12 @@ class Main
   end
   
   def set_current xc
-    puts "Enter sudo password to select #{xc}" if Main.require_sudo_pass?
-    `sudo xcode-select -switch #{xc.folder}`
+    cmd = "sudo xcode-select -switch #{xc.folder}"
+    if Main.require_sudo_pass?
+      puts "Enter sudo password to select #{xc}" 
+      puts "$ #{cmd}"
+    end
+    `#{cmd}`
     puts "Set Xcode to #{xc}"
   end
   
