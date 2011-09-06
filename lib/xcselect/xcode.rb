@@ -1,8 +1,4 @@
 
-# eye candy.
-
-
-
 module Xcselect
   
 
@@ -24,12 +20,13 @@ class Xcode
     "Xcode: #{folder} - #{version} (#{build})"
   end
 
+  # Get an array of all installed xcode objects
   def self.find_all
-    xcode_builds = `mdfind -name xcodebuild`.chomp.split  
+    xcode_builds = `mdfind -name xcodebuild`.chomp.split
+    #TODO: move this checking to init method
     xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /^\/(Volumes|usr\/bin\/)/) && File.exists?(x) }
     xcode_objs = xcode_builds.map {|p| Xcode.new p.sub( /\/usr\/bin.*/, '').chomp.strip }
     xcode_objs.sort
-
   end
 
   def self.current_xcode
@@ -45,13 +42,12 @@ class Xcode
     `#{xcodebuild_path} -showsdks`
   end
 
+  # sort by version number and fallback to build number after   
   def <=>(o)
     res = Float(version) <=> Float(o.version) 
     return res == 0 ?  o.build <=> build : res;
-
-
-
   end
+  
 end
 
 
