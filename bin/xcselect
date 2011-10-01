@@ -127,12 +127,32 @@ class Main
     end    
   end
   
+  def find_all_with_activity_indicator
+    tmp_xcodes = nil;
+    search_thread = Thread.new { tmp_xcodes = Xcode.find_all }
+    display_thread = Thread.new do 
+      sleep 0.4
+      if tmp_xcodes.nil?
+        print "Searching Spotlight "
+        while tmp_xcodes.nil?
+          print "."
+          sleep 0.4
+        end
+        print "\n"
+      end      
+    end
+
+    search_thread.join
+    display_thread.join
+    
+    return tmp_xcodes
+  end
   
   def load_xcodes
-    @xcodes = Xcode.find_all
+    @xcodes = find_all_with_activity_indicator
     @current = xcodes.select {|x| x.folder == Xcode.current_xcode}.first   
   end
-    
+
   def to_s
     "xcodes = #{xcodes}\n current = #{current}"
   end
