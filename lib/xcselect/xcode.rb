@@ -44,7 +44,7 @@ class Xcode
 
   # sort by version number and fallback to build number after   
   def <=>(o)
-    res = Float(version) <=> Float(o.version) 
+    res = version.to_f <=> o.version.to_f
     return res == 0 ?  o.build <=> build : res;
   end
   
