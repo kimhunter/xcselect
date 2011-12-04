@@ -72,17 +72,19 @@ class Main
     exit
   end
 
+  # fix this to take an optional arg
   def open_xcode
     xcodepath = "#{Xcode.current_xcode}/Applications/Xcode.app"
     puts "Opening Xcode in #{Xcode.current_xcode}"
     `open -a #{xcodepath} *.xcodeproj`
   end
 
-  # don't show line to ask for sudo pass 
+  # don't show line to ask for sudo pass unless needed
   def self.require_sudo_pass?
     `sudo -n echo 1 2>&1`.chomp != "1"
   end
   
+  # change the current xcode
   def set_current xc
     cmd = "sudo xcode-select -switch #{xc.folder}"
     if Main.require_sudo_pass?
@@ -106,6 +108,7 @@ class Main
   def select_line x
     "#{x.version} (#{x.build}) #{x.folder} #{'[current]'.red if x.eql? current}"
   end
+
   def show_menu
     puts "Please Select an Xcode install ?\n\n"
     i = 0;
