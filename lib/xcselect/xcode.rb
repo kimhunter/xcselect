@@ -22,13 +22,25 @@ class Xcode
 
   # Get an array of all installed xcode objects
   def self.find_all
+
     xcode_builds = `mdfind -name xcodebuild`.chomp.split
     #TODO: move this checking to init method
     xcode_builds = xcode_builds.select {|x| x =~ /\/xcodebuild$/ && !(x =~ /^\/(Volumes|usr\/bin\/)/) && File.exists?(x) }
     xcode_objs = xcode_builds.map {|p| Xcode.new p.sub( /\/usr\/bin.*/, '').chomp.strip }
+    # Xcode in now in a single application, look for that and use that as a candidate
+    xcode_objs += self.find_new_xcodes
     xcode_objs.sort
   end
-
+  
+  def self.find_new_xcodes
+    # Xcode in now in a single application, look for that and use that as a candidate
+    newXcodes = `mdfind Xcode.app`.chomp.split
+    newXcodes = newXcodes.select do |x| 
+      File.exists? x + "/Contents/Developer/usr/bin/xcodebuild"
+    end
+    newXcodes.map {|x| Xcode.new(x+"/Contents/Developer") }
+  end
+  
   def self.current_xcode
     `xcode-select -print-path`.chomp
   end
