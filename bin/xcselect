@@ -73,8 +73,10 @@ class Main
   end
 
   def open_xcode
-    xcodepath = "#{Xcode.current_xcode}/Applications/Xcode.app"
-    puts "Opening Xcode in #{Xcode.current_xcode}"
+    # TODO: Add conditionall code to look for a project 
+    # and if there isn't one then just open xcode 
+    xcodepath = "#{Xcode.current_xcode_path}"
+    puts "Opening Xcode in #{xcodepath}"
     `open -a #{xcodepath} *.xcodeproj`
   end
 

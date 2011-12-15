@@ -44,7 +44,15 @@ class Xcode
   def self.current_xcode
     `xcode-select -print-path`.chomp
   end
-
+  
+  def self.current_xcode_path
+    path = self.current_xcode
+    if path =~ /(.*Xcode.app)/
+      path = $1
+    end
+    return path
+  end
+  
   def eql?(o)
     return false if o.nil? 
     return (o.folder == folder && o.version == version && o.build == build)
