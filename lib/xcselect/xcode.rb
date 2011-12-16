@@ -49,6 +49,8 @@ class Xcode
     path = self.current_xcode
     if path =~ /(.*Xcode.app)/
       path = $1
+    else
+      path += "/Applications/Xcode.app"
     end
     return path
   end
