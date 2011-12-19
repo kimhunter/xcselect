@@ -76,8 +76,10 @@ class Main
     # TODO: Add conditionall code to look for a project 
     # and if there isn't one then just open xcode 
     xcodepath = "#{Xcode.current_xcode_path}"
+    projects = Dir["*.xcodeproj"]
+    open_project = projects.size > 0 ? projects.first : ""
     puts "Opening Xcode in #{xcodepath}"
-    `open -a #{xcodepath} *.xcodeproj`
+    `open -a #{xcodepath} #{open_project}`
   end
 
   # don't show line to ask for sudo pass 
