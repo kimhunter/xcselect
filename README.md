@@ -13,6 +13,10 @@ Use -a to switch to the next xcode
 
     xcselect -a
     
-use show -s to print info about the current xcode  
+Use show -s to print info about the current xcode  
 
     xcselect -s
+
+To open the current xcode (but will open first .xcproject in working dir if exists)  
+
+    xcselect -o

@@ -37,6 +37,7 @@ class Main
       opts.on('-a', '--alt' , "Alternate through all installs") { select_next() ;exit}
       opts.on('-s', '--show' , "Show Current") { show_current(); exit }
       opts.on('-o', '--open' , "Open *.xcodeproj") {  open_xcode(); exit }
+      opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
     end
     begin
       optparse.parse!
