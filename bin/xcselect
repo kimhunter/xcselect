@@ -79,7 +79,7 @@ class Main
     projects = Dir["*.xcodeproj"]
     open_project = projects.size > 0 ? projects.first : ""
     puts "Opening Xcode in #{xcodepath}"
-    `open -a #{xcodepath} #{open_project}`
+    `open -a "#{xcodepath}" "#{open_project}"`
   end
 
   # don't show line to ask for sudo pass 

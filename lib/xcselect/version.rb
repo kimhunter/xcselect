@@ -1,3 +1,3 @@
 module Xcselect
-  VERSION = "0.0.10-dev"
+  VERSION = "0.0.11"
 end
