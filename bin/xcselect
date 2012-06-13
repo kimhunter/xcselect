@@ -37,6 +37,7 @@ class Main
       opts.on('-a', '--alt' , "Alternate through all installs") { select_next() ;exit}
       opts.on('-s', '--show' , "Show Current") { show_current(); exit }
       opts.on('-o', '--open' , "Open *.xcodeproj") {  open_xcode(); exit }
+      opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
     end
     begin
       optparse.parse!
@@ -74,9 +75,13 @@ class Main
 
   # fix this to take an optional arg
   def open_xcode
-    xcodepath = "#{Xcode.current_xcode}/Applications/Xcode.app"
-    puts "Opening Xcode in #{Xcode.current_xcode}"
-    `open -a #{xcodepath} *.xcodeproj`
+    # TODO: Add conditionall code to look for a project 
+    # and if there isn't one then just open xcode 
+    xcodepath = "#{Xcode.current_xcode_path}"
+    projects = Dir["*.xcodeproj"]
+    open_project = projects.size > 0 ? projects.first : ""
+    puts "Opening Xcode in #{xcodepath}"
+    `open -a "#{xcodepath}" "#{open_project}"`
   end
 
   # don't show line to ask for sudo pass unless needed
