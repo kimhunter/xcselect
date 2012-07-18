@@ -47,7 +47,7 @@ class Xcode
   
   def self.current_xcode_path
     path = self.current_xcode
-    if path =~ /(.*Xcode(.*DP.*).app)/
+    if path =~ /(.*Xcode(.*DP.*)?.app)/
       path = $1
     else
       path += "/Applications/Xcode.app"
