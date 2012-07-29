@@ -20,3 +20,7 @@ Use show -s to print info about the current xcode
 To open the current xcode (but will open first .xcproject in working dir if exists)  
 
     xcselect -o
+
+
+I use this in my bash profile to open an xcode project 
+    alias ox="xcselect -o"
