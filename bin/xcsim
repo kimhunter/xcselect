@@ -8,6 +8,3 @@ require 'xcselect'
 include Xcselect
 
 
-
-
-puts XcSimulator.get_sims
