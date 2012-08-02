@@ -14,11 +14,11 @@ class Main
     @exit_code = 0
     optparse = OptionParser.new do |opts|
       opts.on('-h', '--help', "Display this !!") { puts opts; exit }
+      opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
       opts.on('-p', '--print', "print the path instead of opening it") { @options[:print] = true }
       opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { show_latest_docs() ;exit}
-      opts.on('-n', '--latest-newsstand' , "Select") { show_latest_newsstand(); exit }
-      opts.on('-a', '--apps' , "Show selection list of apps") { show_apps(); exit }
-      opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
+      opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { show_latest_newsstand(); exit }
+      opts.on('-a', '--apps' , "Show list of apps") { show_apps(); exit }
     end
     begin
       optparse.parse!
@@ -40,13 +40,7 @@ class Main
     `open -R "#{p}"`
     end
   end
-  
-  
-  def show_latest_docs
-    app = XcApp.last_built_app
-    open_path app.documents_path
-  end
-  
+
   def select_menu title, selections
     i = 0
     puts title
@@ -63,7 +57,7 @@ class Main
         puts "Invalid Selection"
         @exit_code = 1
       else
-        return input - 1
+        yield input - 1
       end
     rescue SystemExit, Interrupt
       puts ""
@@ -78,36 +72,31 @@ class Main
     latest_app = XcApp.last_built_newsstand_app
     issue_paths = latest_app.newsstand_issue_paths
     issue_names = issue_paths.map {|i| File.basename i }
-    selected_index = select_menu "Select issue in #{latest_app.name} to open:", issue_names
-    return if selected_index == -1
-    open_path issue_paths[selected_index]
+    if issue_paths.size == 1
+      puts "opening only issue #{issue_names.last}" unless @options[:print]
+      open_path issue_paths.last
+      return
+    end
+    select_menu("Select issue in #{latest_app.name} to open:", issue_names) {|i|
+      open_path issue_paths[i]  
+    }
+    
+  end
+  
+  def show_latest_docs
+    app = XcApp.last_built_app
+    open_path app.documents_path
   end
   
   def show_apps
     apps = XcApp.all_apps.sort
-    selected_index = select_menu "Select an app to open:", apps.map{|a| "#{a.name} (#{a.sim_version})"}
-    return if selected_index == -1
-    open_path apps[selected_index].base_dir
+    select_menu("Select an app to open:", apps.map{|a| "#{a.name} (#{a.sim_version})"}) do |selected_index|
+      open_path(apps[selected_index].base_dir)
+    end
   end
 end
 
 
-
-# ARGV << '-p'
-ARGV << "-a"
-
 main = Main.new
 exit main.exit_code
-
-SIMPATH = XcApp.app_support_folder
-# versions = Dir.entries(SIMPATH).select{|p| p =~ /^[0-9].[0-9]/}.sort_by(&:to_f)
-# sim_version_paths = versions.map {|v| SIMPATH + "/" + v + "/Applications"}
-# sim_base = sim_version_paths.last
-
-last_built = XcApp.last_built_app
-
-
-all = XcApp.all_apps.sort
-
-puts all
 

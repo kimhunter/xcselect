@@ -67,6 +67,7 @@ module Xcselect
     end
 
     def newsstand_issue_paths
+      #TODO: make this read the newsstand db and return a hash of names/paths
       if oomph_app? 
         Dir["#{newsstand_path}/*-*/*"]         
       else
