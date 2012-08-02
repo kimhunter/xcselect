@@ -4,8 +4,100 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'xcselect'
 require "fileutils"
+require "optparse"
 
 include Xcselect
+class Main
+  attr_reader :exit_code
+  def initialize
+    @options = default_options
+    @exit_code = 0
+    optparse = OptionParser.new do |opts|
+      opts.on('-h', '--help', "Display this !!") { puts opts; exit }
+      opts.on('-p', '--print', "print the path instead of opening it") { @options[:print] = true }
+      opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { show_latest_docs() ;exit}
+      opts.on('-n', '--latest-newsstand' , "Select") { show_latest_newsstand(); exit }
+      opts.on('-a', '--apps' , "Show selection list of apps") { show_apps(); exit }
+      opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
+    end
+    begin
+      optparse.parse!
+    rescue OptionParser::InvalidOption => e
+      puts "Invalid Option"
+      puts optparse
+      exit 2
+    end
+  end
+  
+  def default_options
+    {:print => false}
+  end
+    
+  def open_path p
+    if @options[:print]
+      puts p
+    else
+    `open -R "#{p}"`
+    end
+  end
+  
+  
+  def show_latest_docs
+    app = XcApp.last_built_app
+    open_path app.documents_path
+  end
+  
+  def select_menu title, selections
+    i = 0
+    puts title
+    selections.each do |opt|
+      i += 1
+      puts "    [#{i}]   #{opt}"
+    end
+    print "Selection: "
+    begin
+      return unless STDIN.tty?
+      input =  STDIN.gets
+      input = input.to_i
+      if input.zero? or input > selections.size
+        puts "Invalid Selection"
+        @exit_code = 1
+      else
+        return input - 1
+      end
+    rescue SystemExit, Interrupt
+      puts ""
+    end    
+    return -1
+  end
+
+  # ============
+  # = Commands =
+  # ============
+  def show_latest_newsstand
+    latest_app = XcApp.last_built_newsstand_app
+    issue_paths = latest_app.newsstand_issue_paths
+    issue_names = issue_paths.map {|i| File.basename i }
+    selected_index = select_menu "Select issue in #{latest_app.name} to open:", issue_names
+    return if selected_index == -1
+    open_path issue_paths[selected_index]
+  end
+  
+  def show_apps
+    apps = XcApp.all_apps.sort
+    selected_index = select_menu "Select an app to open:", apps.map{|a| "#{a.name} (#{a.sim_version})"}
+    return if selected_index == -1
+    open_path apps[selected_index].base_dir
+  end
+end
+
+
+
+# ARGV << '-p'
+ARGV << "-a"
+
+main = Main.new
+exit main.exit_code
 
 SIMPATH = XcApp.app_support_folder
 # versions = Dir.entries(SIMPATH).select{|p| p =~ /^[0-9].[0-9]/}.sort_by(&:to_f)
@@ -15,7 +107,7 @@ SIMPATH = XcApp.app_support_folder
 last_built = XcApp.last_built_app
 
 
-all = XcApp.all_apps.map{|a| a.sim_version}
+all = XcApp.all_apps.sort
 
 puts all
 

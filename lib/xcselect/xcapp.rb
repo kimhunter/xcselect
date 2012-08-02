@@ -4,7 +4,7 @@ module Xcselect
   require 'json'
 
   class XcApp
-    # include Comparable
+    include Comparable
     attr_reader :path
     attr_reader :plist
 
@@ -14,14 +14,13 @@ module Xcselect
     end
 
     def to_s
-      "App: #{bundle_id} - #{name}"
+      "App: #{sim_version} #{name} : #{bundle_id}"
     end
 
-    # sort by version number and fallback to build number after   
-    # def <=>(o)
-    #   res = version.to_f <=> o.version.to_f
-    #   return res == 0 ?  o.build <=> build : res;
-    # end
+    def <=>(o)
+      result = sim_version.to_f <=> o.sim_version.to_f 
+      (!result.zero?) ? result : name <=> o.name
+    end
   
     def sim_version
       path.split('/')[-4]
@@ -51,6 +50,14 @@ module Xcselect
       Dir[@path + "/*Info.plist"].first
     end
 
+    def documents_path
+      "#{base_dir}/Documents"
+    end
+
+    def oomph_app?
+      File.exists? "#{path}/Oomph.plist"
+    end
+    
     def newsstand?
       self['UINewsstandApp'] || false
     end
@@ -60,7 +67,11 @@ module Xcselect
     end
 
     def newsstand_issue_paths
-      Dir["#{newsstand_path}/*-*/*"]
+      if oomph_app? 
+        Dir["#{newsstand_path}/*-*/*"]         
+      else
+        Dir["#{newsstand_path}/*-*"]
+      end
     end
 
     def last_build_time
@@ -74,7 +85,15 @@ module Xcselect
     def self.all_apps
       Dir["#{app_support_folder}/**/*.app"].map{|a| XcApp.new a }
     end
-    
+
+    def self.all_newsstand_apps
+      self.all_apps.select(&:newsstand?)
+    end
+
+    def self.last_built_newsstand_app
+      all_newsstand_apps.sort_by!{|e| e.last_build_time }.last
+    end
+
     def self.last_built_app
       XcApp.all_apps.sort_by!{|e| e.last_build_time }.last
     end
