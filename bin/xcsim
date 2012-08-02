@@ -15,10 +15,13 @@ class Main
     optparse = OptionParser.new do |opts|
       opts.on('-h', '--help', "Display this !!") { puts opts; exit }
       opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
+
       opts.on('-p', '--print', "print the path instead of opening it") { @options[:print] = true }
+      opts.on('-c', '--cd', "cd into the directory (spawns new shell, type `exit` to return) ") { @options[:print] = false; @options[:cd] = true }
+
+      opts.on('-a', '--apps' , "Show list of apps") { show_apps(); exit }
       opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { show_latest_docs() ;exit}
       opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { show_latest_newsstand(); exit }
-      opts.on('-a', '--apps' , "Show list of apps") { show_apps(); exit }
     end
     begin
       optparse.parse!
@@ -34,7 +37,12 @@ class Main
   end
     
   def open_path p
-    if @options[:print]
+    if @options[:cd]
+      # this will allow you to go into the folder 
+      # then type exit to return to your parent shell
+      Dir.chdir p
+      exec ENV['SHELL']
+    elsif  @options[:print]
       puts p
     else
     `open -R "#{p}"`
