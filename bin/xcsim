@@ -44,6 +44,7 @@ class Main
   def select_menu title, selections
     i = 0
     puts title
+    puts ""
     selections.each do |opt|
       i += 1
       puts "    [#{i}]   #{opt}"
@@ -78,7 +79,7 @@ class Main
       open_path ns_issues.last[issue_names.last]
       return
     end
-    select_menu("Select issue in #{latest_app.name} to open:", issue_names) {|i|
+    select_menu("Select issue in #{latest_app} to open:", issue_names) {|i|
       open_path ns_issues.values[i]  
     }
     
