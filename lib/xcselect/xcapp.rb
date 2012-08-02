@@ -72,7 +72,12 @@ module Xcselect
       ns_plist = Plist::parse_xml(read_bin_plist_to_xml(ppath))
       items = ns_plist['$objects'].select{|o| o.class == String && ["$null","issues"].index(o).nil? }
       hash = {}
-      items.each_slice(2){|name,uuid| hash[name] = "#{newsstand_path}/#{uuid}" + (oomph_app? ? "/#{name}" : "/") }
+      paths = newsstand_issue_paths
+      items.each_slice(2) {|name,uuid| 
+        uuid = newsstand_path if uuid.nil?
+        hash[name] = paths.select{|p| p[uuid] }.last
+        hash[name] = File.dirname hash[name] unless oomph_app?
+      }
       return hash
     end
 
