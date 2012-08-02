@@ -2,6 +2,7 @@
 module Xcselect
   require 'pathname'
   require 'json'
+  require "plist"
 
   class XcApp
     include Comparable
@@ -42,10 +43,14 @@ module Xcselect
       self['CFBundleName']
     end
 
-    def read_plist path
-      `plutil -convert json  -o - '#{path}'`
+    def read_plist plist_path
+      `plutil -convert json  -o - '#{plist_path}'`
     end
-
+    
+    def read_bin_plist_to_xml plist_path
+      `plutil -convert xml1  -o - '#{plist_path}'`
+    end
+    
     def plist_path
       Dir[@path + "/*Info.plist"].first
     end
@@ -60,6 +65,15 @@ module Xcselect
     
     def newsstand?
       self['UINewsstandApp'] || false
+    end
+    
+    def newsstand_objects
+      ppath = "#{base_dir}/Library/Application Support/com.apple.newsstand-library.plist"
+      ns_plist = Plist::parse_xml(read_bin_plist_to_xml(ppath))
+      items = ns_plist['$objects'].select{|o| o.class == String && ["$null","issues"].index(o).nil? }
+      hash = {}
+      items.each_slice(2){|name,uuid| hash[name] = "#{newsstand_path}/#{uuid}" + (oomph_app? ? "/#{name}" : "/") }
+      return hash
     end
 
     def newsstand_path
