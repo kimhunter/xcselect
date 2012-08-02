@@ -2,9 +2,20 @@
 
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 
-require "fileutils"
 require 'xcselect'
+require "fileutils"
 
 include Xcselect
 
+SIMPATH = XcApp.app_support_folder
+# versions = Dir.entries(SIMPATH).select{|p| p =~ /^[0-9].[0-9]/}.sort_by(&:to_f)
+# sim_version_paths = versions.map {|v| SIMPATH + "/" + v + "/Applications"}
+# sim_base = sim_version_paths.last
+
+last_built = XcApp.last_built_app
+
+
+all = XcApp.all_apps.map{|a| a.sim_version}
+
+puts all
 
