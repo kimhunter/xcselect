@@ -115,7 +115,7 @@ class Main
   end
 
   def show_menu
-    puts "Please Select an Xcode install ?\n\n"
+    puts "Please Select an Xcode ?\n\n"
     i = 0;
     xopts = xcodes.each do |x|
       select_no = "[#{i+=1}]" 
