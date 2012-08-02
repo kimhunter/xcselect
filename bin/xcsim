@@ -48,7 +48,7 @@ class Main
       i += 1
       puts "    [#{i}]   #{opt}"
     end
-    print "Selection: "
+    print "\nSelection: "
     begin
       return unless STDIN.tty?
       input =  STDIN.gets
@@ -90,7 +90,12 @@ class Main
   
   def show_apps
     apps = XcApp.all_apps.sort
-    select_menu("Select an app to open:", apps.map{|a| "#{a.name} (#{a.sim_version})"}) do |selected_index|
+    return @exit_code = 1 if apps.size == 0
+    if apps.size == 1
+      puts "opening only app #{apps}" unless @options[:print]
+      open_path issue_paths.last
+    end
+    select_menu("Select an app to open:", apps.map(&:to_s)) do |selected_index|
       open_path(apps[selected_index].base_dir)
     end
   end

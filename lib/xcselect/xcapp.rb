@@ -14,7 +14,7 @@ module Xcselect
     end
 
     def to_s
-      "App: #{sim_version} #{name} : #{bundle_id}"
+      "#{name} (#{sim_version})"
     end
 
     def <=>(o)
