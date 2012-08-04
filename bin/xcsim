@@ -13,18 +13,19 @@ class Main
     @options = default_options
     @exit_code = 0
     optparse = OptionParser.new do |opts|
-      opts.on('-h', '--help', "Display this !!") { puts opts; exit }
-      opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
-
       opts.on('-p', '--print', "print the path instead of opening it") { @options[:print] = true }
-      opts.on('-c', '--cd', "cd into the directory (spawns new shell, type `exit` to return) ") { @options[:print] = false; @options[:cd] = true }
+      opts.on('-t', '--touch-app' , "touch app so it becomes latest") { @options[:touch_app] = true }
 
-      opts.on('-a', '--apps' , "Show list of apps") { show_apps(); exit }
-      opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { show_latest_docs() ;exit}
-      opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { show_latest_newsstand(); exit }
+      # Commands
+      opts.on('-h', '--help', "Display this !!") { puts optparse; exit; }
+      opts.on('-v', '--version', "Print version info") { self.command = :show_version  }
+      opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { self.command = :show_latest_docs}
+      opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { self.command = :show_latest_docs }
+      opts.on('-a', '--apps' , "Show list of apps") { self.command = :show_apps ;puts "show apps calla"}
     end
     begin
       optparse.parse!
+      run
     rescue OptionParser::InvalidOption => e
       puts "Invalid Option"
       puts optparse
@@ -32,8 +33,14 @@ class Main
     end
   end
   
+  def run
+    puts command
+    send(command || :show_apps)
+  end
+  
+
   def default_options
-    {:print => false}
+    {:print => false, :touch_app => false}
   end
     
   def open_path p
@@ -48,6 +55,7 @@ class Main
     `open -R "#{p}"`
     end
   end
+
 
   def select_menu title, selections
     i = 0
@@ -98,6 +106,10 @@ class Main
     open_path app.documents_path
   end
   
+  def touch_app app
+    FileUtils.touch app.path
+  end
+  
   def show_apps
     apps = XcApp.all_apps.sort
     return @exit_code = 1 if apps.size == 0
@@ -106,8 +118,17 @@ class Main
       open_path issue_paths.last
     end
     select_menu("Select an app to open:", apps.map(&:to_s)) do |selected_index|
-      open_path(apps[selected_index].base_dir)
+      selected_app = apps[selected_index]
+      if @options[:touch_app]
+        touch_app selected_app
+      else
+        open_path(selected_app.base_dir)
+      end
     end
+  end
+  
+  def show_version
+    puts "xcselect-" + VERSION    
   end
 end
 

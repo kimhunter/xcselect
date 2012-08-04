@@ -7,11 +7,11 @@ module Xcselect
   class XcApp
     include Comparable
     attr_reader :path
-    attr_reader :plist
+    attr_reader :info_plist
 
     def initialize(path)
       @path = path
-      @plist = JSON.parse read_plist(plist_path)
+      @info_plist = JSON.parse read_plist(plist_path)
     end
 
     def to_s
@@ -28,7 +28,7 @@ module Xcselect
     end
 
     def [](k)
-      @plist[k]
+      @info_plist[k]
     end
 
     def base_dir
