@@ -126,8 +126,12 @@ module Xcselect
       all_newsstand_apps.sort_by!{|e| e.last_build_time }.last
     end
 
+    def self.sort_by_touch_time array
+      array.sort_by{|e| e.last_build_time }
+    end
+    
     def self.last_built_app
-      XcApp.all_apps.sort_by!{|e| e.last_build_time }.last
+      XcApp.sort_by_touch_time(all_apps).last
     end
     
   end
