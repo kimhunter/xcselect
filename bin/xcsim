@@ -131,7 +131,18 @@ class Main
     end
     
     last_app = XcApp.sort_by_touch_time(apps).last
-    options = apps.map{|a| a.object_id == last_app.object_id ? a.to_s + " **latest**" : a.to_s }
+    last_newsstand_app = apps.select(&:newsstand?).last
+    same_last_app = last_app.equal? last_newsstand_app
+
+    options = apps.map do |a|
+      s = a.to_s
+      if a.equal? last_app
+        s += " " + (same_last_app ? "[latest]".green : "[latest]".blue)
+      elsif a.equal? last_newsstand_app
+        s += "[latest-ns]".yellow
+      end
+      s
+    end
     
     select_menu("Select an app to open:", options) do |selected_index|
       selected_app = apps[selected_index]
