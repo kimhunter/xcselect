@@ -20,7 +20,7 @@ class Main
       opts.on('-c', '--cd', "cd into the directory (spawns new shell, type `exit` to return) ") { @options[:print] = false; @options[:cd] = true }
 
       # Commands
-      opts.on('-h', '--help', "Display this !!") { puts optparse; exit; }
+      opts.on('-h', '--help', "Display this !!") { self.command = :show_help }
       opts.on('-v', '--version', "Print version info") { self.command = :show_version  }
       opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { self.command = :show_latest_docs}
       opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { self.command = :show_latest_docs }
@@ -141,6 +141,10 @@ class Main
     end
   end
   
+  def show_help
+    puts @optparse
+  end
+
   def show_version
     puts "xcselect-" + VERSION    
   end
