@@ -5,8 +5,10 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require 'xcselect'
 require "fileutils"
 require "optparse"
+require "xcselect/string_colors.rb"
 
 include Xcselect
+
 class Main
   attr_reader :exit_code
   attr_accessor :command
