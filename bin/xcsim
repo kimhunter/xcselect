@@ -70,12 +70,9 @@ class Main
 
 
   def select_menu title, selections
-    i = 0
-    puts title
-    puts ""
-    selections.each do |opt|
-      i += 1
-      puts "    [#{i}]   #{opt}"
+    puts "#{title}\n\n"
+    selections.each_with_index do |opt,i|
+      puts "    [#{i+1}]   #{opt}"
     end
     print "\nSelection: "
     begin
