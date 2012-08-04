@@ -9,12 +9,15 @@ require "optparse"
 include Xcselect
 class Main
   attr_reader :exit_code
+  attr_accessor :command
+  attr_reader :optparse
   def initialize
     @options = default_options
     @exit_code = 0
-    optparse = OptionParser.new do |opts|
+    @optparse = OptionParser.new do |opts|
       opts.on('-p', '--print', "print the path instead of opening it") { @options[:print] = true }
       opts.on('-t', '--touch-app' , "touch app so it becomes latest") { @options[:touch_app] = true }
+      opts.on('-c', '--cd', "cd into the directory (spawns new shell, type `exit` to return) ") { @options[:print] = false; @options[:cd] = true }
 
       # Commands
       opts.on('-h', '--help', "Display this !!") { puts optparse; exit; }
@@ -30,11 +33,18 @@ class Main
       puts "Invalid Option"
       puts optparse
       exit 2
+    rescue Exception => e
+      puts e
     end
   end
   
+  def command=(c)
+    return @command = c if @command.nil?
+    @exit_code = 4
+    raise "Please use only one command"
+  end
+  
   def run
-    puts command
     send(command || :show_apps)
   end
   
@@ -52,7 +62,7 @@ class Main
     elsif  @options[:print]
       puts p
     else
-    `open -R "#{p}"`
+      `open -R "#{p}"`
     end
   end
 
@@ -71,8 +81,8 @@ class Main
       input =  STDIN.gets
       input = input.to_i
       if input.zero? or input > selections.size
-        puts "Invalid Selection"
         @exit_code = 1
+        raise "Invalid Selection"
       else
         yield input - 1
       end
@@ -117,7 +127,11 @@ class Main
       puts "opening only app #{apps}" unless @options[:print]
       open_path issue_paths.last
     end
-    select_menu("Select an app to open:", apps.map(&:to_s)) do |selected_index|
+    
+    last_app = XcApp.sort_by_touch_time(apps).last
+    options = apps.map{|a| a.object_id == last_app.object_id ? a.to_s + " **latest**" : a.to_s }
+    
+    select_menu("Select an app to open:", options) do |selected_index|
       selected_app = apps[selected_index]
       if @options[:touch_app]
         touch_app selected_app
