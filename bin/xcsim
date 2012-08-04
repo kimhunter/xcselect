@@ -26,7 +26,7 @@ class Main
       opts.on('-v', '--version', "Print version info") { self.command = :show_version  }
       opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { self.command = :show_latest_docs}
       opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { self.command = :show_latest_docs }
-      opts.on('-a', '--apps' , "Show list of apps") { self.command = :show_apps ;puts "show apps calla"}
+      opts.on('-a', '--apps' , "Show list of apps") { self.command = :show_apps ;}
     end
     begin
       optparse.parse!
