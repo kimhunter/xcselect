@@ -33,7 +33,7 @@ class Xcode
   end
   
   def self.find_new_xcodes
-    # Xcode in now in a single application, look for that and use that as a candidate
+    # Xcode is now in a single application, look for that and use that as a candidate
     newXcodes = `mdfind 'kMDItemCFBundleIdentifier = com.apple.dt.Xcode'`.chomp.split
     newXcodes = newXcodes.select do |x| 
       File.exists? x + "/Contents/Developer/usr/bin/xcodebuild"

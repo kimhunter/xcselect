@@ -82,8 +82,9 @@ module Xcselect
       nk_issue_key =  ns_plist['$objects'].index(ns_plist['$objects'].select{|o| o['$classname'] == "NKIssue"}.last)
       
       # filter just the nkissue hashes
-      obj_key_hashs = ns_plist['$objects'].select{|o| o.class == Hash && o['$class'] && nk_issue_key == o['$class']['CF$UID'] }
       object_array = ns_plist['$objects']
+      obj_key_hashs = object_array.select{|o| o.class == Hash && o['$class'] && nk_issue_key == o['$class']['CF$UID'] }
+      
       
       # load these paths as our apps have 1 folder inside the newsstand folders
       paths = newsstand_issue_paths if oomph_app?
@@ -116,6 +117,8 @@ module Xcselect
     def last_build_time
       File.mtime path
     end
+
+    # Class methods
     
     # the iPhone Simulator support folder
     def self.app_support_folder
