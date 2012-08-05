@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.version     = Xcselect::VERSION
   s.authors     = ["Kim Hunter"]
   s.email       = ["bigkm1@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/bigkm/xcselect"
   s.summary     = %q{xcselect - Xcode Select}
-  s.description = %q{A more user friendly interface to the xcode-select command showing more info}
+  s.description = %q{A more user friendly interface to the xcode-select command showing more info, xcsim - access the simulator application folders quickly}
 
   s.rubyforge_project = "xcselect"
 
