@@ -48,7 +48,10 @@ Open documents folder for last built app
 
     $ xcsim -d
     
+Open Caches folder for last built app
 
+    $ xcsim -c
+    
 Add -p before any of these and xcsim will print the path. 
 
 If there will be only 1 item to select from the menu will not be displayed and that item will be implicitly selected.
