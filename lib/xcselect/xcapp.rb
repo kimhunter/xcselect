@@ -59,6 +59,10 @@ module Xcselect
       "#{base_dir}/Documents"
     end
 
+    def cache_path
+      "#{base_dir}/Library/Caches"
+    end
+
     def oomph_app?
       File.exists? "#{path}/Oomph.plist"
     end

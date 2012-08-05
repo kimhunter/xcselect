@@ -19,13 +19,14 @@ class Main
     @optparse = OptionParser.new do |opts|
       opts.on('-p', '--print', "print the path instead of opening it") { @options[:print] = true }
       opts.on('-t', '--touch-app' , "touch app so it becomes latest") { @options[:touch_app] = true }
-      opts.on('-c', '--cd', "cd into the directory (spawns new shell, type `exit` to return) ") { @options[:print] = false; @options[:cd] = true }
+      opts.on('--cd', "cd into the directory (spawns new shell, type `exit` to return) ") { @options[:print] = false; @options[:cd] = true }
 
       # Commands
       opts.on('-h', '--help', "Display this !!") { self.command = :show_help }
       opts.on('-v', '--version', "Print version info") { self.command = :show_version  }
       opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { self.command = :show_latest_docs}
       opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { self.command = :show_latest_docs }
+      opts.on('-c', '--latest-cache' , "Reveal last built app's cache folder") { self.command = :show_latest_cache }
       opts.on('-a', '--apps' , "Show list of apps") { self.command = :show_apps ;}
     end
     begin
@@ -108,6 +109,11 @@ class Main
       open_path ns_issues.values[i]  
     }
     
+  end
+  
+  def show_latest_cache
+    app = XcApp.last_built_app
+    open_path app.cache_path
   end
   
   def show_latest_docs
