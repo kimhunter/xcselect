@@ -1,4 +1,6 @@
-require "../lib/xcselect/nkissue"
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+
+require "xcselect"
 require "test/unit"
 require "time"
 
