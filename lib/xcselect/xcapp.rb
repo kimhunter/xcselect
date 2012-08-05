@@ -3,6 +3,7 @@ module Xcselect
   require 'pathname'
   require 'json'
   require "plist"
+  require 'xcselect/nkissue'
 
   class XcApp
     include Comparable
@@ -73,29 +74,15 @@ module Xcselect
     
     # Returns a hash of NKIssues in the form {"issue_name" => path }
     def newsstand_objects
-      issues = {}
+      issues = NKIssue.parse "#{base_dir}/Library/Application Support/com.apple.newsstand-library.plist"
+
       return issues unless newsstand?
-      # this is an NSKeyedArchiver plist
-      ns_plist = Plist::parse_xml(read_bin_plist_to_xml("#{base_dir}/Library/Application Support/com.apple.newsstand-library.plist"))
-      
-      # this is the integer that we will use to filter all archived nkissue objects
-      nk_issue_key =  ns_plist['$objects'].index(ns_plist['$objects'].select{|o| o['$classname'] == "NKIssue"}.last)
-      
-      # filter just the nkissue hashes
-      object_array = ns_plist['$objects']
-      obj_key_hashs = object_array.select{|o| o.class == Hash && o['$class'] && nk_issue_key == o['$class']['CF$UID'] }
-      
-      
-      # load these paths as our apps have 1 folder inside the newsstand folders
-      paths = newsstand_issue_paths if oomph_app?
-      
-      obj_key_hashs.each do |nskey|
-        name = object_array[nskey['name']['CF$UID']]
-        uuid = object_array[nskey['directory']['CF$UID']]
-        next if name.nil?
-        issues[name] = "#{newsstand_path}/#{uuid}"
-        issues[name] = paths.select{|p| p[uuid] }.last if oomph_app? # specially for me :)
+      paths = newsstand_issue_paths if oomph_app?      
+      issues.values.each do |issue|
+        issue.content_path = "#{newsstand_path}/#{issue.uuid}"
+        issue.content_path = paths.select{|p| p[issue.uuid] }.last if oomph_app?
       end
+
       return issues
     end
 
