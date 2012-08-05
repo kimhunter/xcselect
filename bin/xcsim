@@ -25,7 +25,7 @@ class Main
       opts.on('-h', '--help', "Display this !!") { self.command = :show_help }
       opts.on('-v', '--version', "Print version info") { self.command = :show_version  }
       opts.on('-d', '--latest-documents' , "Reveal last built app's documents folder") { self.command = :show_latest_docs}
-      opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { self.command = :show_latest_docs }
+      opts.on('-n', '--latest-newsstand' , "Show list of newsstand issues for last built app") { self.command = :show_latest_newsstand }
       opts.on('-c', '--latest-cache' , "Reveal last built app's cache folder") { self.command = :show_latest_cache }
       opts.on('-a', '--apps' , "Show list of apps") { self.command = :show_apps ;}
     end
