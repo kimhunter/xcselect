@@ -67,6 +67,7 @@ module Xcselect
       self['UINewsstandApp'] || false
     end
     
+    # Returns a hash of NKIssues in the form {"issue_name" => path }
     def newsstand_objects
       issues = {}
       return issues unless newsstand?
@@ -93,10 +94,12 @@ module Xcselect
       return issues
     end
 
+    # path to the app's root newsstand folder
     def newsstand_path
       "#{base_dir}/Library/Caches/Newsstand"
     end
 
+    # all directories in newsstand folder
     def newsstand_issue_paths
       #TODO: make this read the newsstand db and return a hash of names/paths
       if oomph_app? 
@@ -105,19 +108,22 @@ module Xcselect
         Dir["#{newsstand_path}/*-*"]
       end
     end
-
+    
     def last_build_time
       File.mtime path
     end
     
+    # the iPhone Simulator support folder
     def self.app_support_folder
       File.expand_path("~/Library/Application Support/iPhone Simulator/")
     end
     
+    # all applications for all simulator versions, unsorted
     def self.all_apps
       Dir["#{app_support_folder}/**/*.app"].map{|a| XcApp.new a }
     end
-
+    
+    # every newsstand application
     def self.all_newsstand_apps
       self.all_apps.select(&:newsstand?)
     end
