@@ -10,6 +10,7 @@ module Xcselect
     attr_accessor :name
     attr_accessor :uuid
     attr_accessor :date
+    attr_accessor :content_path
 
     def self.find_class_key hash
       hash['$objects'].index(hash['$objects'].select{|o| o['$classname'] == "NKIssue"}.first)
