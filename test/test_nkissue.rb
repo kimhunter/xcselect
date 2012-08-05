@@ -10,7 +10,7 @@ include Xcselect
 class NKIssueTest < Test::Unit::TestCase
   attr_accessor :issues
   def setup
-    @issues = NKIssue.parse "big_cats.plist"
+    @issues = NKIssue.parse File.dirname(__FILE__) + "/big_cats.plist"
   end
   
   
