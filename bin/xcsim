@@ -9,6 +9,9 @@ require "xcselect/string_colors.rb"
 
 include Xcselect
 
+class XcSelectInvalidSelectionException < Exception; end
+
+
 class Main
   attr_reader :exit_code
   attr_accessor :command
@@ -36,15 +39,15 @@ class Main
       puts "Invalid Option"
       puts optparse
       exit 2
-    rescue Exception => e
-      puts e
+    rescue XcSelectInvalidSelectionException => e
+      puts "xcsim: #{e}"
     end
   end
   
   def command=(c)
     return @command = c if @command.nil?
     @exit_code = 4
-    raise "Please use only one command"
+    raise XcSelectInvalidSelectionException, "Please use only one command"
   end
   
   def run
@@ -82,7 +85,7 @@ class Main
       input = input.to_i
       if input.zero? or input > selections.size
         @exit_code = 1
-        raise "Invalid Selection"
+        raise XcSelectInvalidSelectionException, "Invalid Selection"
       else
         yield input - 1
       end
