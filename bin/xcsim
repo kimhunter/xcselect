@@ -98,15 +98,14 @@ class Main
   def show_latest_newsstand
     latest_app = XcApp.last_built_newsstand_app
     ns_issues = latest_app.newsstand_objects
-    issue_paths = latest_app.newsstand_issue_paths
     issue_names = ns_issues.keys
     if issue_names.size == 1
       puts "opening only issue #{issue_names.last}" unless @options[:print]
-      open_path ns_issues.last[issue_names.last]
+      open_path ns_issues.values.last.content_path
       return
     end
     select_menu("Select issue in #{latest_app} to open:", issue_names) {|i|
-      open_path ns_issues.values[i]  
+      open_path ns_issues.values[i].content_path
     }
     
   end
