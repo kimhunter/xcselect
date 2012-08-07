@@ -17,23 +17,27 @@ module Xcselect
     end
 
     def self.parse file_name
-      ns_plist = Plist::parse_xml(read_bin_plist_to_xml(file_name))
-      # this is the integer that we will use to filter all archived nkissue objects
-      nk_issue_key =  find_class_key(ns_plist)
+      begin      
+        ns_plist = Plist::parse_xml(read_bin_plist_to_xml(file_name))
+        # this is the integer that we will use to filter all archived nkissue objects
+        nk_issue_key =  find_class_key(ns_plist)
 
-      # filter just the nkissue hashes
-      object_array = ns_plist['$objects']
-      obj_key_hashs = object_array.select{|o| o.class == Hash && o['$class'] && nk_issue_key == o['$class']['CF$UID'] }
+        # filter just the nkissue hashes
+        object_array = ns_plist['$objects']
+        obj_key_hashs = object_array.select{|o| o.class == Hash && o['$class'] && nk_issue_key == o['$class']['CF$UID'] }
       
-      issues = {}
-      obj_key_hashs.each do |nskey|
-        issue = NKIssue.new
-        issue.name = object_array[nskey['name']['CF$UID']]
-        issue.uuid = object_array[nskey['directory']['CF$UID']]
-        issue.date = self.archive_time_to_time(object_array[nskey['date']['CF$UID']]['NS.time'])
-        issues[issue.name] = issue # unless name.nil?
+        issues = {}
+        obj_key_hashs.each do |nskey|
+          issue = NKIssue.new
+          issue.name = object_array[nskey['name']['CF$UID']]
+          issue.uuid = object_array[nskey['directory']['CF$UID']]
+          issue.date = self.archive_time_to_time(object_array[nskey['date']['CF$UID']]['NS.time'])
+          issues[issue.name] = issue # unless name.nil?
+        end
+        return issues        
+      rescue Exception => e
+        return {}
       end
-      return issues
     end
     
     def to_s
