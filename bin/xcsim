@@ -120,13 +120,13 @@ class Main
   
   def show_latest_cache
     app = XcApp.last_built_app
-    raise "No sim folder" if p.nil?
+    raise "No sim folder" if app.nil?
     open_path app.cache_path
   end
   
   def show_latest_docs
     app = XcApp.last_built_app
-    raise "No sim folder" if p.nil?
+    raise "No sim folder" if app.nil?
     open_path app.documents_path
   end
   
@@ -139,7 +139,8 @@ class Main
     return @exit_code = 1 if apps.size == 0
     if apps.size == 1
       puts "opening only app #{apps}" unless @options[:print]
-      open_path issue_paths.last
+      open_path apps.last.base_dir
+      return
     end
     
     last_app = XcApp.sort_by_touch_time(apps).last
