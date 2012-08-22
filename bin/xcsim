@@ -51,7 +51,12 @@ class Main
   end
   
   def run
-    send(command || :show_apps)
+    begin
+      send(command || :show_apps)
+    rescue Exception => e
+      puts e
+      exit 4
+    end
   end
   
 
@@ -115,11 +120,13 @@ class Main
   
   def show_latest_cache
     app = XcApp.last_built_app
+    raise "No sim folder" if p.nil?
     open_path app.cache_path
   end
   
   def show_latest_docs
     app = XcApp.last_built_app
+    raise "No sim folder" if p.nil?
     open_path app.documents_path
   end
   
