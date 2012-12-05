@@ -123,7 +123,7 @@ module Xcselect
     end
 
     def self.last_built_newsstand_app
-      all_newsstand_apps.sort_by!{|e| e.last_build_time }.last
+      all_newsstand_apps.sort_by{|e| e.last_build_time }.last
     end
 
     def self.sort_by_touch_time array
