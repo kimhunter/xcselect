@@ -73,7 +73,8 @@ class Main
     elsif  @options[:print]
       puts p
     else
-      `open -R "#{p}"`
+      # Open -R doesn't work a lot of the time so removing it
+      `open "#{p}"`
     end
   end
 
