@@ -10,14 +10,14 @@ include Xcselect
 
 class Main
   attr_accessor :xcodes, :current
-  attr_reader :exit_code 
+  attr_reader :exit_code
   def initialize
     @exit_code = 0
     optparse = OptionParser.new do |opts|
       opts.on('-h', '--help', "Display this !!") { puts opts; exit }
       opts.on('-a', '--alt' , "Alternate through all installs") { select_next() ;exit}
       opts.on('-s', '--show' , "Show Current") { show_current(); exit }
-      opts.on('-o', '--open' , "Open *.xcodeproj") {  open_xcode(); exit }
+      opts.on('-o', '--open' , "Open *.<xcworkspace|xcodeproj>") {  open_xcode(); exit }
       opts.on('-v', '--version', "Print version info") { puts "xcselect-" + VERSION; exit; }
     end
     begin
@@ -27,9 +27,9 @@ class Main
       puts optparse
       exit 2
     end
-    
+
     optparse.parse!
-    
+
     begin
       load_xcodes
       show_menu
@@ -39,28 +39,27 @@ class Main
     rescue Exception => e
       puts e
       puts e.backtrace
-      return 
+      return
     end
   end
-  
+
   def select_next
     load_xcodes
-    if xcodes.size > 1 
+    if xcodes.size > 1
       cur_index = xcodes.index(current)
       next_index = (cur_index + 1) % xcodes.size
       set_current xcodes[next_index]
     end
-    
+
     exit
   end
 
   # fix this to take an optional arg
   def open_xcode
-    # TODO: Add conditionall code to look for a project 
-    # and if there isn't one then just open xcode 
+    # TODO: Add conditionall code to look for a project
+    # and if there isn't one then just open xcode
     xcodepath = "#{Xcode.current_xcode_path}"
-    projects = Dir["*.xcodeproj"]
-    open_project = projects.size > 0 ? projects.first : ""
+    open_project = Dir["*.xcworkspace", "*.xcodeproj"].first || ""
     puts "Opening Xcode in #{xcodepath}"
     `open -a "#{xcodepath}" "#{open_project}"`
   end
@@ -69,28 +68,28 @@ class Main
   def self.require_sudo_pass?
     `sudo -n echo 1 2>&1`.chomp != "1"
   end
-  
+
   # change the current xcode
   def set_current xc
     cmd = "sudo xcode-select -switch #{xc.folder}"
     if Main.require_sudo_pass?
-      puts "Enter sudo password to select #{xc}" 
+      puts "Enter sudo password to select #{xc}"
       puts "$ #{cmd}"
     end
     `#{cmd}`
     puts "Set Xcode to #{xc}"
   end
-  
+
   def show_current()
     cur = Xcode.new(Xcode.current_xcode)
     puts cur
     puts cur.sdks
   end
-  
+
   def console_availale
     STDIN.tty?
   end
-    
+
   def select_line x
     "#{x.version} (#{x.build}) #{x.folder} #{'[current]'.red if x.eql? current}"
   end
@@ -99,7 +98,7 @@ class Main
     puts "Please Select an Xcode ?\n\n"
     i = 0;
     xopts = xcodes.each do |x|
-      select_no = "[#{i+=1}]" 
+      select_no = "[#{i+=1}]"
       puts "   #{select_no}    Xcode #{select_line x}"
     end
     print "\nSelection: "
@@ -120,13 +119,13 @@ class Main
     rescue SystemExit, Interrupt
       puts ""
       return
-    end    
+    end
   end
-  
+
   def find_all_with_activity_indicator
     tmp_xcodes = nil;
     search_thread = Thread.new { tmp_xcodes = Xcode.find_all }
-    display_thread = Thread.new do 
+    display_thread = Thread.new do
       sleep 0.4
       if tmp_xcodes.nil?
         print "Searching Spotlight "
@@ -135,25 +134,25 @@ class Main
           sleep 0.4
         end
         print "\n"
-      end      
+      end
     end
 
     search_thread.join
     display_thread.join
-    
+
     return tmp_xcodes
   end
-  
+
   def load_xcodes
     @xcodes = find_all_with_activity_indicator
-    @current = xcodes.select {|x| x.folder == Xcode.current_xcode}.first   
+    @current = xcodes.select {|x| x.folder == Xcode.current_xcode}.first
   end
 
   def to_s
     "xcodes = #{xcodes}\n current = #{current}"
   end
-  
-  
+
+
 end
 
 main = Main.new
