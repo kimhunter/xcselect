@@ -21,7 +21,12 @@ module Xcselect
 
     def <=>(o)
       result = sim_version.to_f <=> o.sim_version.to_f 
-      (!result.zero?) ? result : name <=> o.name
+      if result.zero?
+        return -1 if name.nil?
+        return 1 if o.name.nil?
+        result = name.downcase <=> o.name.downcase
+      end
+      return result
     end
   
     def sim_version
