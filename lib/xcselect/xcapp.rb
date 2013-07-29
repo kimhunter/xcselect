@@ -119,7 +119,8 @@ module Xcselect
     
     # all applications for all simulator versions, unsorted
     def self.all_apps
-      Dir["#{app_support_folder}/**/*.app"].map{|a| XcApp.new a }
+      dirs = Dir["#{app_support_folder}/**/*.app"].reject{|d| File.symlink? d }
+      dirs.map{|a| XcApp.new a }
     end
     
     # every newsstand application
